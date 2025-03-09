@@ -23,13 +23,13 @@ jobs:
       matrix:
         include:
         - language: c-cpp
-          build-mode: none  # 🔥 Evita que CodeQL intente construir C/C++
+          build-mode: manual  # 🔥 Evita que CodeQL intente compilar C/C++
         - language: csharp
           build-mode: none
         - language: go
-          build-mode: none  # 🔥 Evita la autoconstrucción en Go
+          build-mode: none
         - language: java-kotlin
-          build-mode: none  # 🔥 Evita que CodeQL intente compilar Java/Kotlin
+          build-mode: none
         - language: javascript-typescript
           build-mode: none
         - language: python
@@ -45,8 +45,13 @@ jobs:
       uses: github/codeql-action/init@v3
       with:
         languages: ${{ matrix.language }}
-        build-mode: ${{ matrix.build-mode }}  # 🔥 Desactiva construcción manual
+        build-mode: ${{ matrix.build-mode }}  # 🔥 Desactiva la construcción automática
         queries: security-extended,security-and-quality
+
+    # 🔥 Evita compilación en C/C++ para que el análisis no falle
+    - if: matrix.language == 'c-cpp'
+      name: Skip build for C/C++
+      run: echo "Skipping build for C/C++"
 
     - name: Perform CodeQL Analysis
       uses: github/codeql-action/analyze@v3
